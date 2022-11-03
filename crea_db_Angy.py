@@ -42,8 +42,8 @@ st.set_page_config(
   layout="wide",
   )
 
-st.header("Mini-Desafio de Visualizaciones")
-st.info("##### Agrupa por horario")
+st.header("Puntos de carga BIP!")
+st.info("Metro de santiago")
 
 components.html("""
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ckXpOmQIW4o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
