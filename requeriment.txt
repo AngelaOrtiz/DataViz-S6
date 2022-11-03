@@ -6,3 +6,4 @@ pydeck
 streamlit
 matplotlib
 numpy
+tkinter
