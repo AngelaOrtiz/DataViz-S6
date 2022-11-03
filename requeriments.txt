@@ -1,10 +1,7 @@
 turtle
 pandas
-os
-random
 pydeck
 streamlit
 matplotlib
 numpy
-tkinter
-home
+openpyxl
