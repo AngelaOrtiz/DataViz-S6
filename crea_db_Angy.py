@@ -49,6 +49,7 @@ components.html("""
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ckXpOmQIW4o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 """,600,300)
 
+st.info("Mapa de puntos de carga")
 col_sel, col_map = st.columns([1,2])
 
 with st.sidebar:
