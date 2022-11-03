@@ -2,53 +2,12 @@ from turtle import home
 import pandas as pd
 import os
 import random
-from sqlalchemy import Column, Float, Integer, String, create_engine, select
-from sqlalchemy.orm import declarative_base, Session
 from numpy import NaN, append, identity, unicode_
 import pydeck as pdk
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
-
-# Esto solo para hacer referencia a una base de datos SQLlite local:
-ruta_mi_bd = os.path.abspath("./cargas.db")
-mi_bd = f"sqlite:///{ruta_mi_bd}"
-# En caso de ser una base de datos PostgreSQL, el formato sería:
-# mi_bd = f"postgres://usuario:clave@servidor/base_de_datos"
-
-# Conectar a la BD
-# El parámetro echo=True, muestra en consola lo que genera SQLAlchemy
-# El parámetro future=True, activa las funcionalidades de la versión 2.x
-engine = create_engine(mi_bd, echo=True, future=True)
-
-# Crear clase de Modelo de Datos SQLAlchemy
-Base = declarative_base()
-
-# Crear clase de Modelo de la tabla a usar
-class CargasBip(Base):
-  # Nombre de la tabla
-  __tablename__ = "cargasbip"
-
-  # Definir cada atributo de la tabla y su tipo de dato
-  CODIGO = Column(Integer, primary_key=True)
-  ENTIDAD = Column(String(100))
-  NOMBRE_FANTASIA = Column(String(100))
-  DIRECCION = Column(String(100))
-  COMUNA = Column(String(100))
-  HORARIO_REFERENCIAL = Column(String(100))
-  ESTE = Column(Integer)
-  NORTE = Column(Integer)
-  LONGITUD = Column(Float)
-  LATITUD = Column(Float)
-
-  def __repr__(self) -> str:
-    return f" CargasBip(CODIGO={self.CODIGO}, ENTIDAD={self.ENTIDAD}, NOMBRE_FANTASIA={self.NOMBRE_FANTASIA}, " \
-      + f"DIRECCION={self.DIRECCION}, COMUNA={self.COMUNA}, HORARIO_REFERENCIAL={self.HORARIO_REFERENCIAL}," \
-      + f"ESTE={self.ESTE}, NORTE={self.NORTE}, LONGITUD={self.LONGITUD}, LATITUD={self.LATITUD}" \
-      + ")"
-
-# Crear la tabla en BD
-Base.metadata.create_all(engine)
+import streamlit.components.v1 as components
 
 # Leer Excel
 bip = pd.read_excel("carga-bip.xlsx", header=9)
@@ -60,12 +19,15 @@ bip.rename(columns={
   "HORARIO REFERENCIAL": "HORARIO_REFERENCIAL"
 }, inplace=True)
 
+#Elimina registros de comuna que no posee dato
+bip.dropna(subset=["COMUNA"], inplace=True)
+
 #Asigna aleatoriamente horarios a los puntos de carga
 horarios = ["09:00 - 13:00, 14:00 -19:00","08:00 - 13:30, 14:30 -21:00","08:30 - 13:30, 15:00 -20:00","09:30 - 13:00, 15:00 -22:00","10:00 - 13:00, 14:00 -24:00"]
 for i in range (0,len(bip)):
     bip["HORARIO_REFERENCIAL"] = bip["HORARIO_REFERENCIAL"].apply(lambda x: horarios[random.randint(0,len(horarios)-1)])
 
-bip.dropna(subset=["COMUNA"], inplace=True)
+
 #Crea lista de comunas a partir de Excel
 listaComuna=bip['COMUNA'].to_list()
 comunas=[]
@@ -83,6 +45,10 @@ st.set_page_config(
 
 st.header("Mini-Desafio de Visualizaciones")
 st.info("##### Agrupa por horario")
+
+components.html("""
+<iframe width="560" height="315" src="https://www.youtube.com/embed/ckXpOmQIW4o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+""",600,300)
 
 col_sel, col_map = st.columns([1,2])
 
@@ -127,6 +93,7 @@ puntos_mapa = pdk.Deck(
         radius_min_pixels=5,
         radius_max_pixels=50,
         line_width_min_pixels=0.01,
+        get_fill_color=["HORARIO_REFERENCIAL== '09:00 - 13:00, 14:00 -19:00'? 210:10","HORARIO_REFERENCIAL== '08:30 - 13:30, 15:00 -20:00'? 0:180","HORARIO_REFERENCIAL== '09:30 - 13:00, 15:00 -22:00'? 30:255",200]
       )      
     ],
     tooltip={
